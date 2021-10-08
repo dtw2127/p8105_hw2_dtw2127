@@ -3,19 +3,19 @@ title: "p8105_hw2_dtw2127"
 output: github_document
 ---
 
-I'm an R Markdown document! 
+## Problem 1 
 
-# Section 1
-
-Here's a **code chunk** that samples from 
-a _normal distribution_:
+We will read in and clean the "Mr. Trash Wheel" sheet.
 
 ```{r}
-samp = rnorm(100)
-length(samp)
+library(readxl)
+library(tidyverse)
+
+mrtrash_data = read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "Mr. Trash Wheel", skip = 1) %>% #specify sheet to read in and skip row with graphic 
+  select("Dumpster":"Homes Powered*") %>% #omit non-data entries
+  drop_na() %>% # omit rows without dumpster-specific data (drop rows with missing data)
+  mutate(`Sports Balls` = round(`Sports Balls`)) #round sports balls number to nearest integer
+  
 ```
 
-# Section 2
 
-I can take the mean of the sample, too!
-The mean is `r mean(samp)`.
