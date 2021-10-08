@@ -49,4 +49,21 @@ The 2018 Precipitation Dataset has monthly precipitation values (in) for January
 
 The median number of sports balls in a dumpster in 2019 was `r pull(mrtrash_data) %>% median() %>% round(2)`
 
+## Problem 2 
+
+First, we will import and clean the data in pols-month.csv.
+
+```{r}
+
+pols_month = read_csv("./data/pols-month.csv") %>% 
+  separate(mon, into = c("year", "month", "day"), sep = "-") %>%
+  mutate(month = as.numeric(month)) %>% 
+  mutate(month = month.name[month]) %>% 
+  pivot_longer(c(prez_gop,prez_dem), names_prefix = "prez_", names_to = "president") %>% 
+  filter(value > 0) %>%
+  select(-day) #remove day variable 
+
+#note -- value of 2 indicates Ford assuming presidency.
+```
+
 
