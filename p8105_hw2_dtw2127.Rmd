@@ -1,5 +1,6 @@
 ---
 title: "p8105_hw2_dtw2127"
+author: Dee Wang 
 output: github_document
 ---
 
@@ -11,7 +12,7 @@ We will read in and clean the "Mr. Trash Wheel" sheet.
 library(readxl)
 library(tidyverse)
 
-mrtrash_data = read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "Mr. Trash Wheel", skip = 1) %>% #specify sheet to read in and skip row with graphic 
+mrtrash_data = read_excel("./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = "Mr. Trash Wheel", skip = 1) %>% #specify sheet to read in and skip row with graphic 
   select("Dumpster":"Homes Powered*") %>% #omit non-data entries
   drop_na() %>% # omit rows without dumpster-specific data (drop rows with missing data)
   mutate(`Sports Balls` = round(`Sports Balls`)) #round sports balls number to nearest integer
@@ -22,12 +23,12 @@ Next, we'll read and clean precipitation data for 2018 and 2019.
 
 ```{r}
 precip_2018 =
-  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "2018 Precipitation", skip = 1) %>% 
+  read_excel("./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = "2018 Precipitation", skip = 1) %>% 
   drop_na() %>% #drop rows with missing data 
   mutate(Year = 2018) #add year variable 
  
 precip_2019 =
-  read_excel("./data/Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "2019 Precipitation", skip = 1) %>% 
+  read_excel("./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = "2019 Precipitation", skip = 1) %>% 
   drop_na() %>% #drop rows with missing data 
   mutate(Year = 2019) #add year variable 
  
