@@ -57,12 +57,12 @@ First, we will import and clean the data in pols-month.csv.
 ```{r}
 
 pols_month = read_csv("./data/pols-month.csv") %>% 
-  separate(mon, into = c("year", "month", "day"), sep = "-") %>%
-  mutate(month = as.numeric(month)) %>% 
-  mutate(month = month.name[month]) %>% 
-  pivot_longer(c(prez_gop,prez_dem), names_prefix = "prez_", names_to = "president") %>% 
+  separate(mon, into = c("Year", "Month", "Day"), sep = "-") %>%
+  mutate(Month = as.numeric(Month)) %>% 
+  mutate(Month = month.name[Month]) %>% 
+  pivot_longer(c(prez_gop,prez_dem), names_prefix = "prez_", names_to = "President") %>% 
   filter(value > 0) %>%
-  select(-day) #remove day variable 
+  select(-Day) #remove day variable 
 
 #note -- value of 2 indicates Ford assuming presidency.
 ```
@@ -71,12 +71,25 @@ pols_month = read_csv("./data/pols-month.csv") %>%
 
 snp <- read_csv("./data/snp.csv") %>% 
   mutate(date = lubridate::mdy(date)) %>% 
-  separate(date, into = c("year", "month", "day")) %>% 
-  arrange(year, month)
+  separate(date, into = c("Year", "Month", "Day")) %>% 
+  mutate(Month = as.numeric(Month)) %>%
+  mutate(Month = month.name[Month]) %>%
+  arrange(Year, Month) 
 
 ## need to figure out how to fix the dates (>= 2500)
 
 ```
 
+Next, we will tidy the unemployment data. 
 
+```{r}
+unemployment = read_csv("./data/unemployment.csv") %>% 
+  pivot_longer(
+    Jan:Dec,
+    names_to = "Month",
+    values_to = "Unemployment (%)" 
+  ) %>% 
+  mutate(Month = match(Month, month.abb)) %>% 
+  mutate(Month = month.name[Month])
+```
 
