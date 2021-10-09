@@ -95,7 +95,7 @@ unemployment = read_csv("./data/unemployment.csv") %>%
 
 ## Problem 3 
 
-We will load and tidy the 'popular baby names' dataset. The Ethnicity categories are not consistently used. We need to change instances of "ASIAN AND PACI" to "ASIAN AND PACIFIC ISLANDER", and "BLACK NON HISP" to "BLACK NON HISPANIC", and "WHITE NON HISP" to "WHITE NON HISPANIC". 
+We will load and tidy the 'popular baby names' dataset. The Ethnicity categories are not consistently used. We need to change instances of "ASIAN AND PACI" to "ASIAN AND PACIFIC ISLANDER", and "BLACK NON HISP" to "BLACK NON HISPANIC", and "WHITE NON HISP" to "WHITE NON HISPANIC". We also want the case of the names to be consistent. 
 
 ```{r}
 babynames <- read_csv("./data/Popular_Baby_Names.csv") %>% 
@@ -105,6 +105,7 @@ babynames <- read_csv("./data/Popular_Baby_Names.csv") %>%
   ) %>% 
   mutate(Ethnicity = replace(Ethnicity, Ethnicity == "ASIAN AND PACI", "ASIAN AND PACIFIC ISLANDER")
   ) %>% 
+  mutate("Child's First Name" = str_to_title(`Child's First Name`)) %>%
   unique() #remove rows that are duplicated
   
 #this could probably be done more efficiently
@@ -122,4 +123,18 @@ popularity_olivia <- babynames %>%
 popularity_olivia = popularity_olivia[, c(1,5,4,3,2)] #reorder columns
 
 ```
+
+Now we will create a table showing the most popular male baby name over time. 
+
+```{r}
+popular_male_babyname <- babynames %>% 
+  filter(Gender == "MALE") %>% 
+  select("Ethnicity", "Year of Birth", "Rank", "Child's First Name") %>% 
+  pivot_wider(names_from = "Year of Birth",
+              values_from = `Child's First Name`) %>% 
+  filter(Rank == 1) %>% 
+  select(-Rank)
+
+```
+
 
