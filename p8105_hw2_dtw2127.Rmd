@@ -6,12 +6,17 @@ output: github_document
 
 ## Problem 1 
 
-We will read in and clean the "Mr. Trash Wheel" sheet.
-
-```{r}
+```{r setup, message = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 library(readxl)
 library(tidyverse)
 library(lubridate)
+library(ggplot2)
+```
+
+We will read in and clean the "Mr. Trash Wheel" sheet.
+
+```{r}
 
 mrtrash_data = read_excel("./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = "Mr. Trash Wheel", skip = 1) %>% #specify sheet to read in and skip row with graphic 
   select("Dumpster":"Homes Powered*") %>% #omit non-data entries
@@ -137,4 +142,18 @@ popular_male_babyname <- babynames %>%
 
 ```
 
+Next we'll create a scatter plot showing number of male, white, non-hispanic children born in 2016 with a certain name against the rank in popularity of that name. 
+
+```{r}
+
+white_male_names_2016 = babynames %>%
+  filter(Gender == "MALE" & Ethnicity == "WHITE NON HISPANIC" & `Year of Birth` == 2016) %>% 
+  select(Count, Rank)
+
+ggplot(white_male_names_2016, aes(x = Count, y = Rank)) + 
+  geom_point() + 
+  labs( 
+    title = "Frequency of white non-hispanic male baby names against rank in 2016")
+
+```
 
