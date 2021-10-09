@@ -93,3 +93,20 @@ unemployment = read_csv("./data/unemployment.csv") %>%
   mutate(Month = month.name[Month])
 ```
 
+## Problem 3 
+
+We will load and tidy the 'popular baby names' dataset. The Ethnicity categories are not consistently used. We need to change instances of "ASIAN AND PACI" to "ASIAN AND PACIFIC ISLANDER", and "BLACK NON HISP" to "BLACK NON HISPANIC", and "WHITE NON HISP" to "WHITE NON HISPANIC". 
+
+```{r}
+babynames <- read_csv("./data/Popular_Baby_Names.csv") %>% 
+  mutate(Ethnicity = replace(Ethnicity, Ethnicity == "BLACK NON HISP", "BLACK NON HISPANIC")
+  ) %>% 
+  mutate(Ethnicity = replace(Ethnicity, Ethnicity == "WHITE NON HISP", "WHITE NON HISPANIC")
+  ) %>% 
+  mutate(Ethnicity = replace(Ethnicity, Ethnicity == "ASIAN AND PACI", "ASIAN AND PACIFIC ISLANDER")
+  ) %>% 
+  unique() #remove rows that are duplicated
+  
+#this could probably be done more efficiently
+```
+
