@@ -32,12 +32,12 @@ Next, we'll read and clean precipitation data for 2018 and 2019.
 precip_2018 =
   read_excel("./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = "2018 Precipitation", skip = 1) %>% 
   drop_na() %>% #drop rows with missing data 
-  mutate(Year = 2018) #add year variable 
+  mutate(year = 2018) #add year variable 
  
 precip_2019 =
   read_excel("./data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx", sheet = "2019 Precipitation", skip = 1) %>% 
   drop_na() %>% #drop rows with missing data 
-  mutate(Year = 2019) #add year variable 
+  mutate(year = 2019) #add year variable 
  
 ```
 
@@ -52,11 +52,11 @@ precip_combined = bind_rows(precip_2018, precip_2019) %>% #combine precipitation
 
 The Mr. Trash Wheel dataset has `r nrow(mrtrash_data)` observations and `r ncol(mrtrash_data)` variables for the years `r (pull(mrtrash_data, year)) %>% min()` to `r (pull(mrtrash_data, year)) %>% max()`. The dataset includes information on dumpster number, date of collection, weight and volume of litter, as well as how many homes are powered by the trash incinerated, among other variables. 
 
-There are `r nrow(precip_2018)` complete observations in the 2018 Precipitation Dataset, and `r nrow(precip_2019)` complete observations in the 2019 Precipitation Dataset. The combined dataset has `r nrow(precip_combined)` observations.The 2018 Precipitation Dataset has monthly precipitation values (in) for January through December, whereas the 2019 Precipitation Dataset only has monthly precipitation values (in) for January through June. Average monthly rain fall for 2018 was `r pull(precip_2018, Total) %>% mean() %>% round(2)`, and `r pull(precip_2019, Total) %>% mean() %>% round(2)` for the months of January through June in 2019. 
+There are `r nrow(precip_2018)` complete observations in the 2018 Precipitation Dataset, and `r nrow(precip_2019)` complete observations in the 2019 Precipitation Dataset. The combined dataset has `r nrow(precip_combined)` observations.The 2018 Precipitation Dataset has monthly precipitation values for January through December, whereas the 2019 Precipitation Dataset only has monthly precipitation values (in) for January through June. Average monthly rain fall for 2018 was `r pull(precip_2018, Total) %>% mean() %>% round(2)`, and `r pull(precip_2019, Total) %>% mean() %>% round(2)` for the months of January through June in 2019. 
 
-The total precipitation in 2018 was `r pull(precip_2018, Total) %>% sum()`.
+The total precipitation in 2018, as calculated with available data, was `r pull(precip_2018, Total) %>% sum()`.
 
-The median number of sports balls in a dumpster in 2019 was `r pull(mrtrash_data) %>% median() %>% round(2)`
+The median number of sports balls in a dumpster in 2019 was `r pull(mrtrash_data, sports_balls) %>% median() %>% round(2)`.
 
 ## Problem 2 
 
@@ -70,7 +70,7 @@ pols_month = read_csv("./data/pols-month.csv") %>%
   mutate(Month = month.name[Month]) %>% 
   pivot_longer(c(prez_gop,prez_dem), names_prefix = "prez_", names_to = "President") %>% 
   filter(value > 0) %>%
-  select(-Day) %>% #remove day variable 
+  select(-Day, -value) %>% #remove day variable 
   mutate(Year = as.numeric(Year))
 
 #note -- value of 2 indicates Ford assuming presidency.
@@ -114,11 +114,11 @@ pols_snp_unemployment = left_join(pols_snp, unemployment, by = c("Year", "Month"
 
 ```
 
-The original 'pols' dataset consisted of `r nrow(pols_month)` rows, and 9 columns. The dataset has information related to the number of democratic and republican national politicians at a given time. 
+The original 'pols' dataset consisted of `r nrow(pols_month)` rows, and 9 columns. The dataset has information related to the number of democratic and republican national politicians at a given time, for the years `r pull(pols_month, Year) %>% min()` to `r pull(pols_month, Year) %>% max()`. 
 
-The original 'snp' dataset contained `r nrow(snp)` rows and 2 columns. The dataset contains information about closing values of the S&P stock index at a given time.
+The original 'snp' dataset contained `r nrow(snp)` rows and 2 columns. The dataset contains information about closing values of the S&P stock index at a given time, for the years `r pull(snp, Year) %>% min()` to `r pull(snp, Year) %>% max()`.
 
-The original 'unemployment' dataset contained `r nrow(unemployment)` and 13 columns. The dataset contains information about percentage of unemployment at a given time. 
+The original 'unemployment' dataset contained `r nrow(unemployment)` and 13 columns. The dataset contains information about percentage of unemployment at a given time, for the years `r pull(unemployment, Year) %>% min()` to `r pull(unemployment, Year) %>% max()`. 
 
 The combined dataset is `r nrow(pols_snp_unemployment)` rows and `r ncol(pols_snp_unemployment)`, and contains data from the years `r pull(pols_snp_unemployment, Year) %>% min()` to `r pull(pols_snp_unemployment, Year) %>% max()`. Key variables include month and year, closing value of the SNP, party affiliation of the president and unemployment percentage.
 
@@ -128,26 +128,26 @@ We will load and tidy the 'popular baby names' dataset. The Ethnicity categories
 
 ```{r}
 babynames <- read_csv("./data/Popular_Baby_Names.csv") %>% 
-  mutate(Ethnicity = replace(Ethnicity, Ethnicity == "BLACK NON HISP", "BLACK NON HISPANIC")
+  janitor::clean_names() %>% 
+  mutate(ethnicity = replace(ethnicity, ethnicity == "BLACK NON HISP", "BLACK NON HISPANIC")
   ) %>% 
-  mutate(Ethnicity = replace(Ethnicity, Ethnicity == "WHITE NON HISP", "WHITE NON HISPANIC")
+  mutate(ethnicity = replace(ethnicity, ethnicity == "WHITE NON HISP", "WHITE NON HISPANIC")
   ) %>% 
-  mutate(Ethnicity = replace(Ethnicity, Ethnicity == "ASIAN AND PACI", "ASIAN AND PACIFIC ISLANDER")
+  mutate(ethnicity = replace(ethnicity, ethnicity == "ASIAN AND PACI", "ASIAN AND PACIFIC ISLANDER")
   ) %>% 
-  mutate("Child's First Name" = str_to_title(`Child's First Name`)) %>%
-  unique() #remove rows that are duplicated
+  mutate(childs_first_name = str_to_title(childs_first_name)) %>%
+  distinct() #remove rows that are duplicated
   
-#this could probably be done more efficiently
 ```
 
 We'll create reader-friendly tables showing the rank in popularity of the name "Olivia" as a female baby name over time. 
 
 ```{r}
 popularity_olivia <- babynames %>% 
-  filter(`Child's First Name` == "Olivia") %>% 
-  select("Ethnicity", "Year of Birth", "Rank") %>% 
-  pivot_wider(names_from = "Year of Birth",
-            values_from = "Rank") 
+  filter(childs_first_name == "Olivia") %>% 
+  select("ethnicity", "year_of_birth", "rank") %>% 
+  pivot_wider(names_from = "year_of_birth",
+            values_from = "rank") 
 
 popularity_olivia = popularity_olivia[, c(1,5,4,3,2)] #reorder columns
 
@@ -157,12 +157,14 @@ Now we will create a table showing the most popular male baby name over time.
 
 ```{r}
 popular_male_babyname <- babynames %>% 
-  filter(Gender == "MALE") %>% 
-  select("Ethnicity", "Year of Birth", "Rank", "Child's First Name") %>% 
-  pivot_wider(names_from = "Year of Birth",
-              values_from = `Child's First Name`) %>% 
-  filter(Rank == 1) %>% 
-  select(-Rank)
+  filter(gender == "MALE") %>% 
+  select("ethnicity", "year_of_birth", "rank", "childs_first_name") %>% 
+  pivot_wider(names_from = "year_of_birth",
+              values_from = "childs_first_name") %>% 
+  filter(rank == 1) %>% 
+  select(-rank)
+
+popular_male_babyname = popular_male_babyname[, c(1,7,6,5,4,3,2)] #reorder columns
 
 ```
 
@@ -171,13 +173,14 @@ Next we'll create a scatter plot showing number of male, white, non-hispanic chi
 ```{r}
 
 white_male_names_2016 = babynames %>%
-  filter(Gender == "MALE" & Ethnicity == "WHITE NON HISPANIC" & `Year of Birth` == 2016) %>% 
-  select(Count, Rank)
+  filter(gender == "MALE" & ethnicity == "WHITE NON HISPANIC" & year_of_birth == 2016) %>% 
+  select(count, rank)
 
-ggplot(white_male_names_2016, aes(x = Count, y = Rank)) + 
+ggplot(white_male_names_2016, aes(x = count, y = rank)) + 
   geom_point() + 
-  labs( 
-    title = "Frequency of white non-hispanic male baby names against rank in 2016")
+  labs(x = "number of children with name", 
+       y = "rank in popularity of name",
+       title = "Frequency of white non-hispanic male baby names against rank in 2016")
 
 ```
 
